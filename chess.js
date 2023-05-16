@@ -2,7 +2,14 @@ let boardDiv, canvas, ctx;
 const boardSize = 8;
 const squareSize = 100;
 const defaultBoardArray = ["K", "N", "R", "0", "0", "r", "n", "k"];
+const whitePieces = ["K", "N", "R"];
+const blackPieces = ["k", "n", "r"];
+
 let boardArray = defaultBoardArray;
+
+const States = { SELECT: "SELECT", MOVE: "MOVE" };
+let state = States.SELECT;
+let whiteMove = true;
 
 function getImagesfromDom() {
   let pieces = {
@@ -17,14 +24,14 @@ function getImagesfromDom() {
   return pieces;
 }
 
-function drawBoard(ctx) {
+function drawBoard(ctx, selectedSquare) {
   let lightColor = "#F0D9B5";
   let darkColor = "#B58863";
   let pieces = getImagesfromDom();
 
   ctx.fillStyle = "#4a433e";
   ctx.fillRect(0, 100, boardSize * squareSize, 30);
-  // draw board
+  // draw board squares
   for (let i = 0; i < boardSize; i++) {
     if (i % 2 == 0) {
       ctx.fillStyle = darkColor;
@@ -39,6 +46,13 @@ function drawBoard(ctx) {
     ctx.fillText(i.toString(), i * squareSize + 45, squareSize + 22);
   }
 
+  if (state === States.SELECT) {
+    ctx.fillStyle = "#edc915";
+    ctx.globalAlpha = 0.4;
+    ctx.fillRect(selectedSquare * 100, 0, squareSize, squareSize);
+    ctx.globalAlpha = 1.0;
+  }
+
   // draw pieces
   for (i in boardArray) {
     if (boardArray[i] != "0") {
@@ -51,52 +65,68 @@ function drawBoard(ctx) {
       );
     }
   }
-  /*ctx.fillStyle = darkColor;
-  ctx.fillRect(0, 0, 100, 100);
-  ctx.fillRect(200, 0, 100, 100);
-  ctx.fillRect(400, 0, 100, 100);
-  ctx.fillRect(600, 0, 100, 100);
-  ctx.fillRect(800, 0, 100, 100);
-
-  ctx.fillStyle = lightColor;
-  ctx.fillRect(100, 0, 100, 100);
-  ctx.fillRect(300, 0, 100, 100);
-  ctx.fillRect(500, 0, 100, 100);
-  ctx.fillRect(700, 0, 100, 100);*/
 }
 
-function setPieceImg(type) {
-  if (type == "K") {
-    return "img/kw.png";
-  }
-  if (type == "N") {
-    return "img/nw.png";
-  }
-  if (type == "R") {
-    return "img/rw.png";
-  }
-  if (type == "k") {
-    return "img/kb.png";
-  }
-  if (type == "n") {
-    return "img/nb.png";
-  }
-  if (type == "r") {
-    return "img/rb.png";
+function setUpCanvas(canvas) {
+  canvas.id = "canvas";
+  canvas.width = boardSize * 100;
+  canvas.height = squareSize + 30;
+
+  canvas.style.zIndex = 8;
+  canvas.style.position = "absolute";
+  canvas.style.border = "1px solid";
+
+  canvas.addEventListener("mousedown", function (e) {
+    if (state === States.SELECT) {
+    }
+    //console.log(getMousePosition(e));
+    //console.log(getSquareFromClick(e));
+    selectPiece(e);
+  });
+}
+
+function selectPiece(e) {
+  let selectedSquare = getSquareFromClick(e);
+  if (whiteMove) {
+    if (whitePieces.includes(boardArray[selectedSquare])) {
+      drawBoard(ctx, selectedSquare);
+    }
+  } else {
+    if (blackPieces.includes(boardArray[selectedSquare])) {
+      drawBoard(ctx, selectedSquare);
+    }
   }
 }
 
-function setUpCanvas(cnv, ctx) {
-  cnv.id = "canvas";
-  cnv.width = boardSize * 100;
-  cnv.height = squareSize + 30;
+/*function getCursorPosition(e, canvas) {
+  let x, y;
 
-  cnv.style.zIndex = 8;
-  cnv.style.position = "absolute";
-  cnv.style.border = "1px solid";
+  canoffset = canvas.offset();
+  x =
+    e.clientX +
+    document.body.scrollLeft +
+    document.documentElement.scrollLeft -
+    Math.floor(canoffset.left);
+  y =
+    e.clientY +
+    document.body.scrollTop +
+    document.documentElement.scrollTop -
+    Math.floor(canoffset.top) +
+    1;
 
-  //ctx.fillStyle = currentBg;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  return [x, y];
+}*/
+
+function getMousePosition(evt) {
+  var rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top,
+  };
+}
+
+function getSquareFromClick(e) {
+  return Math.floor(getMousePosition(e).x / 100);
 }
 
 window.addEventListener("load", function () {
