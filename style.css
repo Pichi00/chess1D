@@ -1,0 +1,20 @@
+#board {
+  display: inline-block;
+  flex-direction: row;
+  /*width: 800px;*/
+}
+
+.square {
+  width: 100px;
+  height: 100px;
+  float: left;
+}
+.numSquare {
+  width: 100px;
+  height: 30px;
+  text-align: center;
+  justify-content: center;
+  background-color: #c59974;
+  font-size: 24px;
+  float: left;
+}
