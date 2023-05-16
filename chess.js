@@ -10,6 +10,8 @@ let boardArray = defaultBoardArray;
 const States = { SELECT: "SELECT", MOVE: "MOVE" };
 let state = States.SELECT;
 let whiteMove = true;
+let selectedPiece = null;
+let selectedSquare = null;
 
 function getImagesfromDom() {
   let pieces = {
@@ -46,6 +48,7 @@ function drawBoard(ctx, selectedSquare) {
     ctx.fillText(i.toString(), i * squareSize + 45, squareSize + 22);
   }
 
+  //  draw selected square
   if (state === States.SELECT) {
     ctx.fillStyle = "#edc915";
     ctx.globalAlpha = 0.4;
@@ -78,24 +81,39 @@ function setUpCanvas(canvas) {
 
   canvas.addEventListener("mousedown", function (e) {
     if (state === States.SELECT) {
+      selectPiece(e);
+    } else if (state === States.MOVE) {
+      movePiece(e);
     }
     //console.log(getMousePosition(e));
     //console.log(getSquareFromClick(e));
-    selectPiece(e);
   });
 }
 
 function selectPiece(e) {
-  let selectedSquare = getSquareFromClick(e);
+  selectedSquare = getSquareFromClick(e);
   if (whiteMove) {
     if (whitePieces.includes(boardArray[selectedSquare])) {
+      selectedPiece = boardArray[selectedSquare];
       drawBoard(ctx, selectedSquare);
+      state = States.MOVE;
     }
   } else {
     if (blackPieces.includes(boardArray[selectedSquare])) {
+      selectedPiece = boardArray[selectedSquare];
       drawBoard(ctx, selectedSquare);
+      state = States.MOVE;
     }
   }
+}
+
+function movePiece(e) {
+  let newSquare = getSquareFromClick(e);
+  boardArray[newSquare] = boardArray[selectedSquare];
+  boardArray[selectedSquare] = "0";
+  drawBoard(ctx, selectedSquare);
+  state = States.SELECT;
+  whiteMove = !whiteMove;
 }
 
 /*function getCursorPosition(e, canvas) {
