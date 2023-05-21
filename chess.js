@@ -6,6 +6,7 @@ const whitePieces = ["K", "N", "R"];
 const blackPieces = ["k", "n", "r"];
 
 let boardArray = defaultBoardArray;
+let legalMoves = {};
 
 const States = { SELECT: "SELECT", MOVE: "MOVE" };
 let state = States.SELECT;
@@ -105,11 +106,13 @@ function selectPiece(e) {
       state = States.MOVE;
     }
   }
+  checkLegalMoves(boardArray);
 }
 
 function movePiece(e) {
   let newSquare = getSquareFromClick(e);
   let avaliableMoves = checkAvaliableMoves(selectedSquare);
+
   if (avaliableMoves.includes(newSquare)) {
     boardArray[newSquare] = boardArray[selectedSquare];
     boardArray[selectedSquare] = "0";
@@ -126,7 +129,7 @@ function movePiece(e) {
 function checkAvaliableMoves(n) {
   let piece = boardArray[n];
   let avaliableMoves = [];
-
+  //console.log(piece);
   // Rooks moves
   if (piece === "R" || piece === "r") {
     // Moves right
@@ -171,7 +174,25 @@ function checkAvaliableMoves(n) {
     }
   }
 
-  console.log(avaliableMoves);
+  // King moves
+  else if (piece === "K" || piece === "k") {
+    // Move right
+    if (
+      boardArray[n + 1] != undefined &&
+      !arePiecesSameType(piece, boardArray[n + 1])
+    ) {
+      avaliableMoves.push(n + 1);
+    }
+    // Move left
+    if (
+      boardArray[n - 1] != undefined &&
+      !arePiecesSameType(piece, boardArray[n - 1])
+    ) {
+      avaliableMoves.push(n - 1);
+    }
+  }
+
+  //console.log(avaliableMoves);
   return avaliableMoves;
 }
 
@@ -191,24 +212,90 @@ function getPieceColor(piece) {
     return "black";
   }
 }
-/*function getCursorPosition(e, canvas) {
-  let x, y;
 
-  canoffset = canvas.offset();
-  x =
-    e.clientX +
-    document.body.scrollLeft +
-    document.documentElement.scrollLeft -
-    Math.floor(canoffset.left);
-  y =
-    e.clientY +
-    document.body.scrollTop +
-    document.documentElement.scrollTop -
-    Math.floor(canoffset.top) +
-    1;
+function checkLegalMoves(array) {
+  let legalMoves = {};
 
-  return [x, y];
-}*/
+  for (let i = 0; i < array.length; i++) {
+    let pieceColor = getPieceColor(array[i]);
+    if (
+      (whiteMove && pieceColor === "black") ||
+      (!whiteMove && pieceColor === "white")
+    ) {
+      continue;
+    }
+
+    let avaliableMoves = checkAvaliableMoves(i);
+    for (move in avaliableMoves) {
+      if (checkIfLegalMove(i, avaliableMoves[move])) {
+        if (legalMoves[array[i]] === undefined) {
+          legalMoves[array[i]] = [];
+        }
+        legalMoves[array[i]].push(avaliableMoves[move]);
+      }
+    }
+  }
+  console.log(legalMoves);
+}
+
+function checkIfLegalMove(posStart, posEnd) {
+  let boardArrCopy = boardArray.slice();
+  let color = getPieceColor(boardArray[posStart]);
+  boardArrCopy[posEnd] = boardArrCopy[posStart];
+  boardArrCopy[posStart] = "0";
+  let rookPos;
+  let knightPos;
+  let kingPos;
+  switch (color) {
+    case "white":
+      rookPos = boardArrCopy.indexOf("r");
+      knightPos = boardArrCopy.indexOf("n");
+      kingPos = boardArrCopy.indexOf("K");
+
+      // Check if black rook attacks king
+      if (rookPos > kingPos) {
+        if (ifRookAttacksKing(boardArrCopy, kingPos, rookPos)) {
+          return false;
+        }
+      }
+      // Check if black knight attacks king
+      if (knightPos >= 0) {
+        if (knightPos === kingPos + 2 || knightPos === kingPos - 2) {
+          return false;
+        }
+      }
+      return true;
+    case "black":
+      rookPos = boardArrCopy.indexOf("R");
+      knightPos = boardArrCopy.indexOf("N");
+      kingPos = boardArrCopy.indexOf("k");
+      // Check if white rook attacks king
+      if (kingPos > rookPos) {
+        if (ifRookAttacksKing(boardArrCopy, rookPos, kingPos)) {
+          return false;
+        }
+      }
+      // Check if white knight attacks king
+      if (knightPos >= 0) {
+        if (knightPos === kingPos + 2 || knightPos === kingPos - 2) {
+          return false;
+        }
+      }
+      return true;
+    default:
+      return false;
+  }
+  console.log(boardArrCopy);
+}
+
+function ifRookAttacksKing(boardArr, startPos, endPos) {
+  for (let i = startPos + 1; i < endPos; i++) {
+    if (boardArr[i] != "0") {
+      return false;
+    }
+  }
+  return true;
+}
 
 function getMousePosition(evt) {
   var rect = canvas.getBoundingClientRect();
