@@ -49,7 +49,7 @@ function drawBoard(ctx, selectedSquare) {
   }
 
   //  draw selected square
-  if (state === States.SELECT) {
+  if (state === States.SELECT && selectedSquare != null) {
     ctx.fillStyle = "#edc915";
     ctx.globalAlpha = 0.4;
     ctx.fillRect(selectedSquare * 100, 0, squareSize, squareSize);
@@ -94,7 +94,7 @@ function selectPiece(e) {
   selectedSquare = getSquareFromClick(e);
   if (whiteMove) {
     if (whitePieces.includes(boardArray[selectedSquare])) {
-      selectedPiece = boardArray[selectedSquare];
+      checkAvaliableMoves(selectedSquare);
       drawBoard(ctx, selectedSquare);
       state = States.MOVE;
     }
@@ -109,13 +109,88 @@ function selectPiece(e) {
 
 function movePiece(e) {
   let newSquare = getSquareFromClick(e);
-  boardArray[newSquare] = boardArray[selectedSquare];
-  boardArray[selectedSquare] = "0";
-  drawBoard(ctx, selectedSquare);
-  state = States.SELECT;
-  whiteMove = !whiteMove;
+  let avaliableMoves = checkAvaliableMoves(selectedSquare);
+  if (avaliableMoves.includes(newSquare)) {
+    boardArray[newSquare] = boardArray[selectedSquare];
+    boardArray[selectedSquare] = "0";
+    drawBoard(ctx, selectedSquare);
+    state = States.SELECT;
+    whiteMove = !whiteMove;
+  } else {
+    selectedSquare = null;
+    state = States.SELECT;
+    drawBoard(ctx, selectedSquare);
+  }
 }
 
+function checkAvaliableMoves(n) {
+  let piece = boardArray[n];
+  let avaliableMoves = [];
+
+  // Rooks moves
+  if (piece === "R" || piece === "r") {
+    // Moves right
+    for (let i = n; i < boardSize - 1; i++) {
+      if (boardArray[i + 1] === "0") {
+        avaliableMoves.push(i + 1);
+      } else if (!arePiecesSameType(piece, boardArray[i + 1])) {
+        avaliableMoves.push(i + 1);
+        break;
+      } else {
+        break;
+      }
+    }
+    // Moves left
+    for (let i = n; i > 0; i--) {
+      if (boardArray[i - 1] === "0") {
+        avaliableMoves.push(i - 1);
+      } else if (!arePiecesSameType(piece, boardArray[i - 1])) {
+        avaliableMoves.push(i - 1);
+        break;
+      } else {
+        break;
+      }
+    }
+  }
+
+  // Knights moves
+  else if (piece === "N" || piece === "n") {
+    // Move right
+    if (
+      boardArray[n + 2] != undefined &&
+      !arePiecesSameType(piece, boardArray[n + 2])
+    ) {
+      avaliableMoves.push(n + 2);
+    }
+    // Move left
+    if (
+      boardArray[n - 2] != undefined &&
+      !arePiecesSameType(piece, boardArray[n - 2])
+    ) {
+      avaliableMoves.push(n - 2);
+    }
+  }
+
+  console.log(avaliableMoves);
+  return avaliableMoves;
+}
+
+function arePiecesSameType(p1, p2) {
+  if (getPieceColor(p1) === getPieceColor(p2)) {
+    return true;
+  }
+  return false;
+}
+
+function getPieceColor(piece) {
+  if (piece === "0" || piece === undefined || piece === null) {
+    return "none";
+  } else if (piece === piece.toUpperCase()) {
+    return "white";
+  } else if (piece === piece.toLowerCase()) {
+    return "black";
+  }
+}
 /*function getCursorPosition(e, canvas) {
   let x, y;
 
