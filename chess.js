@@ -1,14 +1,26 @@
 let boardDiv, canvas, ctx;
-const boardSize = 8;
+const boardSize = 11;
 const squareSize = 100;
-const defaultBoardArray = ["K", "N", "R", "0", "0", "r", "n", "k"];
+const defaultBoardArray = [
+  "K",
+  "N",
+  "R",
+  "R",
+  "0",
+  "0",
+  "0",
+  "r",
+  "r",
+  "n",
+  "k",
+];
 const whitePieces = ["K", "N", "R"];
 const blackPieces = ["k", "n", "r"];
 
 let boardArray = defaultBoardArray;
 let legalMoves = {};
 
-const States = { SELECT: "SELECT", MOVE: "MOVE" };
+const States = { SELECT: "SELECT", MOVE: "MOVE", GAMEOVER: "GAMEOVER" };
 let state = States.SELECT;
 let whiteMove = true;
 let selectedPiece = null;
@@ -101,19 +113,18 @@ function selectPiece(e) {
     }
   } else {
     if (blackPieces.includes(boardArray[selectedSquare])) {
-      selectedPiece = boardArray[selectedSquare];
+      checkAvaliableMoves(selectedSquare);
       drawBoard(ctx, selectedSquare);
       state = States.MOVE;
     }
   }
-  checkLegalMoves(boardArray);
 }
 
 function movePiece(e) {
   let newSquare = getSquareFromClick(e);
-  let avaliableMoves = checkAvaliableMoves(selectedSquare);
-
-  if (avaliableMoves.includes(newSquare)) {
+  let allLegalMoves = checkLegalMoves();
+  let legalMoves = allLegalMoves[boardArray[selectedSquare]];
+  if (legalMoves != undefined && legalMoves.includes(newSquare)) {
     boardArray[newSquare] = boardArray[selectedSquare];
     boardArray[selectedSquare] = "0";
     drawBoard(ctx, selectedSquare);
@@ -123,6 +134,11 @@ function movePiece(e) {
     selectedSquare = null;
     state = States.SELECT;
     drawBoard(ctx, selectedSquare);
+  }
+  allLegalMoves = checkLegalMoves();
+  if (Object.keys(allLegalMoves).length == 0) {
+    state = States.GAMEOVER;
+    console.log("Stalemate");
   }
 }
 
@@ -213,11 +229,11 @@ function getPieceColor(piece) {
   }
 }
 
-function checkLegalMoves(array) {
+function checkLegalMoves() {
   let legalMoves = {};
 
-  for (let i = 0; i < array.length; i++) {
-    let pieceColor = getPieceColor(array[i]);
+  for (let i = 0; i < boardArray.length; i++) {
+    let pieceColor = getPieceColor(boardArray[i]);
     if (
       (whiteMove && pieceColor === "black") ||
       (!whiteMove && pieceColor === "white")
@@ -228,14 +244,14 @@ function checkLegalMoves(array) {
     let avaliableMoves = checkAvaliableMoves(i);
     for (move in avaliableMoves) {
       if (checkIfLegalMove(i, avaliableMoves[move])) {
-        if (legalMoves[array[i]] === undefined) {
-          legalMoves[array[i]] = [];
+        if (legalMoves[boardArray[i]] === undefined) {
+          legalMoves[boardArray[i]] = [];
         }
-        legalMoves[array[i]].push(avaliableMoves[move]);
+        legalMoves[boardArray[i]].push(avaliableMoves[move]);
       }
     }
   }
-  console.log(legalMoves);
+  return legalMoves;
 }
 
 function checkIfLegalMove(posStart, posEnd) {
@@ -245,47 +261,50 @@ function checkIfLegalMove(posStart, posEnd) {
   boardArrCopy[posStart] = "0";
   let rookPos;
   let knightPos;
-  let kingPos;
+  let wKingPos = boardArrCopy.indexOf("K");
+  let bKingPos = boardArrCopy.indexOf("k");
   switch (color) {
     case "white":
       rookPos = boardArrCopy.indexOf("r");
       knightPos = boardArrCopy.indexOf("n");
-      kingPos = boardArrCopy.indexOf("K");
+      wKingPos = boardArrCopy.indexOf("K");
 
       // Check if black rook attacks king
-      if (rookPos > kingPos) {
-        if (ifRookAttacksKing(boardArrCopy, kingPos, rookPos)) {
+      if (rookPos > wKingPos) {
+        if (ifRookAttacksKing(boardArrCopy, wKingPos, rookPos)) {
           return false;
         }
       }
       // Check if black knight attacks king
       if (knightPos >= 0) {
-        if (knightPos === kingPos + 2 || knightPos === kingPos - 2) {
+        if (knightPos === wKingPos + 2 || knightPos === wKingPos - 2) {
           return false;
         }
       }
-      return true;
+      break;
     case "black":
       rookPos = boardArrCopy.indexOf("R");
       knightPos = boardArrCopy.indexOf("N");
-      kingPos = boardArrCopy.indexOf("k");
       // Check if white rook attacks king
-      if (kingPos > rookPos) {
-        if (ifRookAttacksKing(boardArrCopy, rookPos, kingPos)) {
+      if (bKingPos > rookPos) {
+        if (ifRookAttacksKing(boardArrCopy, rookPos, bKingPos)) {
           return false;
         }
       }
       // Check if white knight attacks king
       if (knightPos >= 0) {
-        if (knightPos === kingPos + 2 || knightPos === kingPos - 2) {
+        if (knightPos === bKingPos + 2 || knightPos === bKingPos - 2) {
           return false;
         }
       }
-      return true;
+      break;
     default:
       return false;
   }
-  console.log(boardArrCopy);
+  if (wKingPos === bKingPos - 1 || wKingPos == bKingPos + 1) {
+    return false;
+  }
+  return true;
 }
 
 function ifRookAttacksKing(boardArr, startPos, endPos) {
