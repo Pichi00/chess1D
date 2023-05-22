@@ -1,19 +1,7 @@
 let boardDiv, canvas, ctx;
-const boardSize = 11;
+const boardSize = 8;
 const squareSize = 100;
-const defaultBoardArray = [
-  "K",
-  "N",
-  "R",
-  "R",
-  "0",
-  "0",
-  "0",
-  "r",
-  "r",
-  "n",
-  "k",
-];
+const defaultBoardArray = ["K", "N", "R", "0", "0", "r", "n", "k"];
 const whitePieces = ["K", "N", "R"];
 const blackPieces = ["k", "n", "r"];
 
@@ -58,7 +46,7 @@ function drawBoard(ctx, selectedSquare) {
     // draw square number
     ctx.font = "24px serif";
     ctx.fillStyle = "white";
-    ctx.fillText(i.toString(), i * squareSize + 45, squareSize + 22);
+    ctx.fillText((i + 1).toString(), i * squareSize + 45, squareSize + 22);
   }
 
   //  draw selected square
@@ -136,9 +124,15 @@ function movePiece(e) {
     drawBoard(ctx, selectedSquare);
   }
   allLegalMoves = checkLegalMoves();
-  if (Object.keys(allLegalMoves).length == 0) {
+  if (ifIsCheck()) {
+    console.log("Check");
+  }
+  if (Object.keys(allLegalMoves).length == 0 && ifIsCheck()) {
     state = States.GAMEOVER;
-    console.log("Stalemate");
+    console.log(whiteMove ? "Black" : "White", "won by checkmate");
+  } else if (Object.keys(allLegalMoves).length == 0) {
+    state = States.GAMEOVER;
+    console.log("Stealmate");
   }
 }
 
@@ -314,6 +308,40 @@ function ifRookAttacksKing(boardArr, startPos, endPos) {
     }
   }
   return true;
+}
+
+function ifIsCheck() {
+  let wKingPos = boardArray.indexOf("K");
+  let bKingPos = boardArray.indexOf("k");
+  let wRookPos = boardArray.indexOf("R");
+  let bRookPos = boardArray.indexOf("r");
+  let wKnightPos = boardArray.indexOf("N");
+  let bKnightPos = boardArray.indexOf("n");
+  if (whiteMove) {
+    if (bRookPos > wKingPos) {
+      if (ifRookAttacksKing(boardArray, wKingPos, bRookPos)) {
+        return true;
+      }
+    }
+    if (
+      bKnightPos > 0 &&
+      (bKnightPos === wKingPos + 2 || bKnightPos === wKingPos - 2)
+    ) {
+      return true;
+    }
+  } else {
+    if (bKingPos > wRookPos) {
+      if (ifRookAttacksKing(boardArray, wRookPos, bKingPos)) {
+        return true;
+      }
+    }
+    if (
+      wKnightPos > 0 &&
+      (wKnightPos === bKingPos + 2 || wKnightPos === bKingPos - 2)
+    ) {
+      return true;
+    }
+  }
 }
 
 function getMousePosition(evt) {
