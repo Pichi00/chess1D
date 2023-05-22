@@ -7,6 +7,9 @@ h1 {
   font-size: 48px;
   color: white;
 }
+h2 {
+  color: white;
+}
 main {
   height: 80vh;
 }
@@ -14,6 +17,20 @@ main {
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+
+button {
+  margin: 20px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 20px;
+  background-color: #948d87;
+  border: 2px solid black;
+}
+button:hover {
+  background-color: #837c76;
+}
+button:active {
+  background-color: #726b65;
 }
 
 footer {

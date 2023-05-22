@@ -4,8 +4,9 @@ const squareSize = 100;
 const defaultBoardArray = ["K", "N", "R", "0", "0", "r", "n", "k"];
 const whitePieces = ["K", "N", "R"];
 const blackPieces = ["k", "n", "r"];
+let gameResult;
 
-let boardArray = defaultBoardArray;
+let boardArray = [];
 let legalMoves = {};
 
 const States = { SELECT: "SELECT", MOVE: "MOVE", GAMEOVER: "GAMEOVER" };
@@ -72,26 +73,6 @@ function drawBoard(ctx, selectedSquare) {
   }
 }
 
-function setUpCanvas(canvas) {
-  canvas.id = "canvas";
-  canvas.width = boardSize * 100;
-  canvas.height = squareSize + 30;
-
-  //canvas.style.zIndex = 8;
-  //canvas.style.position = "absolute";
-  canvas.style.border = "2px solid";
-
-  canvas.addEventListener("mousedown", function (e) {
-    if (state === States.SELECT) {
-      selectPiece(e);
-    } else if (state === States.MOVE) {
-      movePiece(e);
-    }
-    //console.log(getMousePosition(e));
-    //console.log(getSquareFromClick(e));
-  });
-}
-
 function selectPiece(e) {
   selectedSquare = getSquareFromClick(e);
   if (whiteMove) {
@@ -128,11 +109,18 @@ function movePiece(e) {
   allLegalMoves = checkLegalMoves();
   if (Object.keys(allLegalMoves).length == 0 && ifIsCheck()) {
     state = States.GAMEOVER;
-    console.log(whiteMove ? "Black" : "White", "won by checkmate");
+    gameResult.hidden = false;
+    gameResult.innerText = "Szach mat! Zwycięstwo ";
+    gameResult.innerText += whiteMove ? " czarnych" : " białych";
+    resetGameButton.hidden = false;
   } else if (Object.keys(allLegalMoves).length == 0) {
     state = States.GAMEOVER;
-    console.log("Draw by stealmate");
+    console.log(gameResult);
+    gameResult.hidden = false;
+    gameResult.innerText = "Remis przez pata";
+    resetGameButton.hidden = false;
   }
+  checkIfEnoughMaterial();
 }
 
 function checkAvaliableMoves(n) {
@@ -352,7 +340,24 @@ function addPosition() {
   }
   if (positions[boardArray] >= 3) {
     state = States.GAMEOVER;
-    console.log("Draw by repetition");
+    gameResult.hidden = false;
+    gameResult.innerText = "Remis przez powtórzenie pozycji";
+    resetGameButton.hidden = false;
+  }
+}
+
+function checkIfEnoughMaterial() {
+  if (
+    !boardArray.includes("R") &&
+    !boardArray.includes("N") &&
+    !boardArray.includes("r") &&
+    !boardArray.includes("n")
+  ) {
+    state = States.GAMEOVER;
+
+    gameResult.hidden = false;
+    gameResult.innerText = "Remis przez niewystarczający materiał";
+    resetGameButton.hidden = false;
   }
 }
 
@@ -368,16 +373,43 @@ function getSquareFromClick(e) {
   return Math.floor(getMousePosition(e).x / 100);
 }
 
+function setUpCanvas(canvas) {
+  canvas.id = "canvas";
+  canvas.width = boardSize * 100;
+  canvas.height = squareSize + 30;
+
+  //canvas.style.zIndex = 8;
+  //canvas.style.position = "absolute";
+  canvas.style.border = "3px solid";
+  canvas.style.borderRadius = "10px";
+
+  canvas.addEventListener("mousedown", function (e) {
+    if (state === States.SELECT) {
+      selectPiece(e);
+    } else if (state === States.MOVE) {
+      movePiece(e);
+    }
+  });
+}
+
 function setUpGame() {
+  state = States.SELECT;
+  whiteMove = true;
+  boardArray = defaultBoardArray.slice();
+  drawBoard(ctx, null);
+  positions = {};
+  addPosition();
+  gameResult.innerText = "";
+  gameResult.hidden = true;
+  resetGameButton.hidden = true;
+}
+window.addEventListener("load", function () {
   boardDiv = document.getElementById("board");
   canvas = document.createElement("canvas");
   ctx = canvas.getContext("2d");
+  gameResult = document.getElementById("gameResult");
+  resetGameButton = document.getElementById("resetGameButton");
   setUpCanvas(canvas, ctx);
   boardDiv.appendChild(canvas);
-  drawBoard(ctx);
-  positions = {};
-  addPosition();
-}
-window.addEventListener("load", function () {
   setUpGame();
 });
