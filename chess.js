@@ -77,9 +77,9 @@ function setUpCanvas(canvas) {
   canvas.width = boardSize * 100;
   canvas.height = squareSize + 30;
 
-  canvas.style.zIndex = 8;
-  canvas.style.position = "absolute";
-  canvas.style.border = "1px solid";
+  //canvas.style.zIndex = 8;
+  //canvas.style.position = "absolute";
+  canvas.style.border = "2px solid";
 
   canvas.addEventListener("mousedown", function (e) {
     if (state === States.SELECT) {
@@ -368,7 +368,7 @@ function getSquareFromClick(e) {
   return Math.floor(getMousePosition(e).x / 100);
 }
 
-window.addEventListener("load", function () {
+function setUpGame() {
   boardDiv = document.getElementById("board");
   canvas = document.createElement("canvas");
   ctx = canvas.getContext("2d");
@@ -377,4 +377,7 @@ window.addEventListener("load", function () {
   drawBoard(ctx);
   positions = {};
   addPosition();
+}
+window.addEventListener("load", function () {
+  setUpGame();
 });
