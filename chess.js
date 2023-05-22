@@ -13,6 +13,7 @@ let state = States.SELECT;
 let whiteMove = true;
 let selectedPiece = null;
 let selectedSquare = null;
+let positions = {};
 
 function getImagesfromDom() {
   let pieces = {
@@ -118,21 +119,19 @@ function movePiece(e) {
     drawBoard(ctx, selectedSquare);
     state = States.SELECT;
     whiteMove = !whiteMove;
+    addPosition();
   } else {
     selectedSquare = null;
     state = States.SELECT;
     drawBoard(ctx, selectedSquare);
   }
   allLegalMoves = checkLegalMoves();
-  if (ifIsCheck()) {
-    console.log("Check");
-  }
   if (Object.keys(allLegalMoves).length == 0 && ifIsCheck()) {
     state = States.GAMEOVER;
     console.log(whiteMove ? "Black" : "White", "won by checkmate");
   } else if (Object.keys(allLegalMoves).length == 0) {
     state = States.GAMEOVER;
-    console.log("Stealmate");
+    console.log("Draw by stealmate");
   }
 }
 
@@ -342,6 +341,19 @@ function ifIsCheck() {
       return true;
     }
   }
+  return false;
+}
+
+function addPosition() {
+  if (Object.keys(positions).includes(boardArray.toString())) {
+    positions[boardArray] += 1;
+  } else {
+    positions[boardArray] = 1;
+  }
+  if (positions[boardArray] >= 3) {
+    state = States.GAMEOVER;
+    console.log("Draw by repetition");
+  }
 }
 
 function getMousePosition(evt) {
@@ -363,4 +375,6 @@ window.addEventListener("load", function () {
   setUpCanvas(canvas, ctx);
   boardDiv.appendChild(canvas);
   drawBoard(ctx);
+  positions = {};
+  addPosition();
 });

@@ -1,6 +1,7 @@
 #board {
-  display: inline-block;
+  display: flex;
   flex-direction: row;
+  justify-content: center;
   /*width: 800px;*/
 }
 
