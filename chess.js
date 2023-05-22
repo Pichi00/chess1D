@@ -1,7 +1,7 @@
 let boardDiv, canvas, ctx;
-const boardSize = 8;
+const boardSize = 10;
 const squareSize = 100;
-const defaultBoardArray = ["K", "N", "R", "0", "0", "r", "n", "k"];
+const defaultBoardArray = ["K", "N", "N", "N", "0", "0", "n", "n", "n", "k"];
 const whitePieces = ["K", "N", "R"];
 const blackPieces = ["k", "n", "r"];
 let gameResult;
@@ -115,7 +115,6 @@ function movePiece(e) {
     resetGameButton.hidden = false;
   } else if (Object.keys(allLegalMoves).length == 0) {
     state = States.GAMEOVER;
-    console.log(gameResult);
     gameResult.hidden = false;
     gameResult.innerText = "Remis przez pata";
     resetGameButton.hidden = false;
@@ -126,7 +125,6 @@ function movePiece(e) {
 function checkAvaliableMoves(n) {
   let piece = boardArray[n];
   let avaliableMoves = [];
-  //console.log(piece);
   // Rooks moves
   if (piece === "R" || piece === "r") {
     // Moves right
@@ -189,7 +187,6 @@ function checkAvaliableMoves(n) {
     }
   }
 
-  //console.log(avaliableMoves);
   return avaliableMoves;
 }
 
@@ -241,13 +238,13 @@ function checkIfLegalMove(posStart, posEnd) {
   boardArrCopy[posEnd] = boardArrCopy[posStart];
   boardArrCopy[posStart] = "0";
   let rookPos;
-  let knightPos;
   let wKingPos = boardArrCopy.indexOf("K");
   let bKingPos = boardArrCopy.indexOf("k");
+  let knightIndexes = [];
+  let i = -1;
   switch (color) {
     case "white":
       rookPos = boardArrCopy.indexOf("r");
-      knightPos = boardArrCopy.indexOf("n");
       wKingPos = boardArrCopy.indexOf("K");
 
       // Check if black rook attacks king
@@ -257,15 +254,25 @@ function checkIfLegalMove(posStart, posEnd) {
         }
       }
       // Check if black knight attacks king
-      if (knightPos >= 0) {
-        if (knightPos === wKingPos + 2 || knightPos === wKingPos - 2) {
-          return false;
+      knightIndexes = [];
+
+      while ((i = boardArrCopy.indexOf("n", i + 1)) !== -1) {
+        knightIndexes.push(i);
+      }
+
+      for (index in knightIndexes) {
+        if (knightIndexes[index] >= 0) {
+          if (
+            knightIndexes[index] === wKingPos + 2 ||
+            knightIndexes[index] === wKingPos - 2
+          ) {
+            return false;
+          }
         }
       }
       break;
     case "black":
       rookPos = boardArrCopy.indexOf("R");
-      knightPos = boardArrCopy.indexOf("N");
       // Check if white rook attacks king
       if (bKingPos > rookPos) {
         if (ifRookAttacksKing(boardArrCopy, rookPos, bKingPos)) {
@@ -273,9 +280,20 @@ function checkIfLegalMove(posStart, posEnd) {
         }
       }
       // Check if white knight attacks king
-      if (knightPos >= 0) {
-        if (knightPos === bKingPos + 2 || knightPos === bKingPos - 2) {
-          return false;
+      knightIndexes = [];
+
+      while ((i = boardArrCopy.indexOf("N", i + 1)) !== -1) {
+        knightIndexes.push(i);
+      }
+
+      for (index in knightIndexes) {
+        if (knightIndexes[index] >= 0) {
+          if (
+            knightIndexes[index] === bKingPos + 2 ||
+            knightIndexes[index] === bKingPos - 2
+          ) {
+            return false;
+          }
         }
       }
       break;
@@ -302,19 +320,30 @@ function ifIsCheck() {
   let bKingPos = boardArray.indexOf("k");
   let wRookPos = boardArray.indexOf("R");
   let bRookPos = boardArray.indexOf("r");
-  let wKnightPos = boardArray.indexOf("N");
-  let bKnightPos = boardArray.indexOf("n");
+  let wKnightIndexes = [];
+  let bKnightIndexes = [];
+  let i = -1;
   if (whiteMove) {
     if (bRookPos > wKingPos) {
       if (ifRookAttacksKing(boardArray, wKingPos, bRookPos)) {
         return true;
       }
     }
-    if (
-      bKnightPos > 0 &&
-      (bKnightPos === wKingPos + 2 || bKnightPos === wKingPos - 2)
-    ) {
-      return true;
+
+    bKnightIndexes = [];
+    while ((i = boardArray.indexOf("n", i + 1)) !== -1) {
+      bKnightIndexes.push(i);
+    }
+    for (index in bKnightIndexes) {
+      if (bKnightIndexes[index] >= 0) {
+        if (
+          bKnightIndexes[index] > 0 &&
+          (bKnightIndexes[index] === wKingPos + 2 ||
+            bKnightIndexes[index] === wKingPos - 2)
+        ) {
+          return true;
+        }
+      }
     }
   } else {
     if (bKingPos > wRookPos) {
@@ -322,11 +351,21 @@ function ifIsCheck() {
         return true;
       }
     }
-    if (
-      wKnightPos > 0 &&
-      (wKnightPos === bKingPos + 2 || wKnightPos === bKingPos - 2)
-    ) {
-      return true;
+
+    wKnightIndexes = [];
+    while ((i = boardArray.indexOf("N", i + 1)) !== -1) {
+      wKnightIndexes.push(i);
+    }
+    for (index in wKnightIndexes) {
+      if (wKnightIndexes[index] >= 0) {
+        if (
+          wKnightIndexes[index] > 0 &&
+          (wKnightIndexes[index] === bKingPos + 2 ||
+            wKnightIndexes[index] === bKingPos - 2)
+        ) {
+          return true;
+        }
+      }
     }
   }
   return false;
