@@ -99,7 +99,6 @@ function movePiece(e) {
   let newSquare = getSquareFromClick(e);
   let allLegalMoves = checkLegalMoves();
   let legalMoves = allLegalMoves[boardArray[selectedSquare] + selectedSquare];
-  console.log(allLegalMoves[boardArray[selectedSquare] + selectedSquare]);
   if (legalMoves != undefined && legalMoves.includes(newSquare)) {
     boardArray[newSquare] = boardArray[selectedSquare];
     boardArray[selectedSquare] = "0";
@@ -237,7 +236,6 @@ function checkLegalMoves() {
       }
     }
   }
-  console.log(legalMoves);
   return legalMoves;
 }
 
