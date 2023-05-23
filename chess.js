@@ -1,10 +1,13 @@
 let boardDiv, canvas, ctx;
-const boardSize = 8;
+let boardSize = 8;
 const squareSize = 100;
-const defaultBoardArray = ["K", "N", "N", "0", "0", "0", "0", "k"];
+
 const whitePieces = ["K", "N", "R"];
 const blackPieces = ["k", "n", "r"];
+
+//Buttons
 let gameResult;
+let backButton;
 
 let boardArray = [];
 let legalMoves = {};
@@ -13,7 +16,6 @@ const States = {
   SELECT: "SELECT",
   MOVE: "MOVE",
   GAMEOVER: "GAMEOVER",
-  SETUP: "SETUP",
 };
 let state = States.SELECT;
 let whiteMove = true;
@@ -119,11 +121,13 @@ function movePiece(e) {
     gameResult.innerText = "Szach mat! Zwycięstwo ";
     gameResult.innerText += whiteMove ? " czarnych" : " białych";
     resetGameButton.hidden = false;
+    backButton.hidden = false;
   } else if (Object.keys(allLegalMoves).length == 0) {
     state = States.GAMEOVER;
     gameResult.hidden = false;
     gameResult.innerText = "Remis przez pata";
     resetGameButton.hidden = false;
+    backButton.hidden = false;
   }
   checkIfEnoughMaterial();
 }
@@ -422,6 +426,8 @@ function addPosition() {
     gameResult.hidden = false;
     gameResult.innerText = "Remis przez powtórzenie pozycji";
     resetGameButton.hidden = false;
+    backButton.hidden = false;
+    backButton.hidden = false;
   }
 }
 
@@ -437,6 +443,7 @@ function checkIfEnoughMaterial() {
     gameResult.hidden = false;
     gameResult.innerText = "Remis przez niewystarczający materiał";
     resetGameButton.hidden = false;
+    backButton.hidden = false;
   }
 }
 
@@ -471,6 +478,10 @@ function setUpCanvas(canvas) {
   });
 }
 
+function goBackToConfig() {
+  window.location.replace("index.html");
+}
+
 function startGame() {
   addCanvas();
   setUpGame();
@@ -486,16 +497,19 @@ function setUpGame() {
   gameResult.innerText = "";
   gameResult.hidden = true;
   resetGameButton.hidden = true;
+  backButton.hidden = true;
 }
 
 function addCanvas() {
   boardDiv.appendChild(canvas);
 }
+
 window.addEventListener("load", function () {
   boardDiv = document.getElementById("board");
   canvas = document.createElement("canvas");
   ctx = canvas.getContext("2d");
   gameResult = document.getElementById("gameResult");
+  backButton = document.getElementById("backButton");
   resetGameButton = document.getElementById("resetGameButton");
   setUpCanvas(canvas, ctx);
   startGame();

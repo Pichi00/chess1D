@@ -4,32 +4,18 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>1D Chess</title>
+    <title>Szachy 1D</title>
     <link rel="stylesheet" href="style.css" type="text/css" />
-    <script src="chess.js"></script>
+    <script src="menu.js"></script>
+    <script src="config.js"></script>
   </head>
   <body>
     <h1>Szachy 1D</h1>
     <main>
-      <div id="board"></div>
-      <h2 id="gameResult"></h2>
       <div id="buttons">
-        <button id="resetGameButton" onclick="setUpGame()" hidden>
-          Zresetuj grę
-        </button>
-      </div>
-
-      <div class="pieces-images" hidden>
-        <img id="white-king" src="img/kw.png" />
-        <img id="white-knight" src="img/nw.png" />
-        <img id="white-rook" src="img/rw.png" />
-
-        <img id="black-king" src="img/kb.png" />
-        <img id="black-knight" src="img/nb.png" />
-        <img id="black-rook" src="img/rb.png" />
+        <button id="startGame" onclick="goToGame()">Rozpocznij grę</button>
       </div>
     </main>
-
     <footer>
       <div>Projekt zaliczeniowy na przedmiot "Teoria szachów"</div>
       <div>Autor: Piotr Kołodziejski</div>
