@@ -8,14 +8,69 @@
     <link rel="stylesheet" href="style.css" type="text/css" />
     <script src="menu.js"></script>
     <script src="config.js"></script>
+    <script src="chess.js"></script>
   </head>
   <body>
     <h1>Szachy 1D</h1>
     <main>
-      <div id="buttons">
-        <button id="startGame" onclick="goToGame()">Rozpocznij grę</button>
+      <div id="configMenu">
+        <h2>Rozmiar szachownicy</h2>
+        <select
+          id="boardSizeSelect"
+          name="boardSizeSelect"
+          style="border: 2px black solid"
+          onchange="generateSelectTable()"
+        >
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+        </select>
+        <div id="tableContainer">
+          <table id="selectPositionTable">
+            <tr>
+              <td>Król</td>
+              <td>
+                <select id="pieceSelect1" name="pieceSelect1">
+                  <option value="knight">Skoczek</option>
+                  <option value="rook">Wieża</option>
+                  <option value="none">Brak</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div id="buttons">
+          <button id="startGame" onclick="goToGame()">Rozpocznij grę</button>
+        </div>
+      </div>
+
+      <div id="gameView" hidden>
+        <div id="board"></div>
+        <h2 id="gameResult"></h2>
+        <div id="buttons">
+          <button id="backButton" onclick="goBackToConfig()" hidden>
+            Wróc do konfiguracji
+          </button>
+          <button id="resetGameButton" onclick="setUpGame()" hidden>
+            Zagraj ponownie
+          </button>
+        </div>
+
+        <div class="pieces-images" hidden>
+          <img id="white-king" src="img/kw.png" />
+          <img id="white-knight" src="img/nw.png" />
+          <img id="white-rook" src="img/rw.png" />
+
+          <img id="black-king" src="img/kb.png" />
+          <img id="black-knight" src="img/nb.png" />
+          <img id="black-rook" src="img/rb.png" />
+        </div>
       </div>
     </main>
+
     <footer>
       <div>Projekt zaliczeniowy na przedmiot "Teoria szachów"</div>
       <div>Autor: Piotr Kołodziejski</div>

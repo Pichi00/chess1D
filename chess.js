@@ -1,7 +1,5 @@
 let boardDiv, canvas, ctx;
-let boardSize = 8;
 const squareSize = 100;
-
 const whitePieces = ["K", "N", "R"];
 const blackPieces = ["k", "n", "r"];
 
@@ -459,7 +457,7 @@ function getSquareFromClick(e) {
   return Math.floor(getMousePosition(e).x / 100);
 }
 
-function setUpCanvas(canvas) {
+function setUpCanvas() {
   canvas.id = "canvas";
   canvas.width = boardSize * 100;
   canvas.height = squareSize + 30;
@@ -468,21 +466,10 @@ function setUpCanvas(canvas) {
   //canvas.style.position = "absolute";
   canvas.style.border = "3px solid";
   canvas.style.borderRadius = "10px";
-
-  canvas.addEventListener("mousedown", function (e) {
-    if (state === States.SELECT) {
-      selectPiece(e);
-    } else if (state === States.MOVE) {
-      movePiece(e);
-    }
-  });
-}
-
-function goBackToConfig() {
-  window.location.replace("index.html");
 }
 
 function startGame() {
+  setUpCanvas();
   addCanvas();
   setUpGame();
 }
@@ -501,16 +488,27 @@ function setUpGame() {
 }
 
 function addCanvas() {
+  /*let child = boardDiv.lastElementChild;
+  if (child) {
+    boardDiv.removeChild(child);
+  }*/
+  ctx = canvas.getContext("2d");
   boardDiv.appendChild(canvas);
 }
 
 window.addEventListener("load", function () {
   boardDiv = document.getElementById("board");
   canvas = document.createElement("canvas");
+  canvas.addEventListener("mousedown", function (e) {
+    if (state === States.SELECT) {
+      selectPiece(e);
+    } else if (state === States.MOVE) {
+      movePiece(e);
+    }
+  });
   ctx = canvas.getContext("2d");
   gameResult = document.getElementById("gameResult");
   backButton = document.getElementById("backButton");
   resetGameButton = document.getElementById("resetGameButton");
-  setUpCanvas(canvas, ctx);
-  startGame();
+  //startGame();
 });

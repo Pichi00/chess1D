@@ -7,7 +7,8 @@ h1 {
   font-size: 48px;
   color: white;
 }
-h2 {
+h2,
+p {
   color: white;
 }
 main {
@@ -25,6 +26,7 @@ button {
   font-size: 20px;
   background-color: #948d87;
   border: 2px solid black;
+  padding: 5px;
 }
 button:hover {
   background-color: #837c76;
@@ -52,4 +54,29 @@ footer {
   background-color: #c59974;
   font-size: 24px;
   float: left;
+}
+#tableContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+table {
+  border-collapse: collapse;
+  font-size: 20px;
+  text-align: center;
+  margin: 20px;
+}
+tr,
+td {
+  background-color: #948d87;
+  border: 2px black solid;
+  padding: 5px;
+}
+
+select {
+  font-size: 20px;
+  font-family: "Courier New", Courier, monospace;
+  background-color: #948d87;
+  border: 0;
 }
