@@ -1,7 +1,7 @@
 let boardDiv, canvas, ctx;
-const boardSize = 10;
+const boardSize = 8;
 const squareSize = 100;
-const defaultBoardArray = ["K", "N", "N", "N", "0", "0", "n", "n", "n", "k"];
+const defaultBoardArray = ["K", "N", "R", "0", "0", "r", "n", "k"];
 const whitePieces = ["K", "N", "R"];
 const blackPieces = ["k", "n", "r"];
 let gameResult;
@@ -9,7 +9,12 @@ let gameResult;
 let boardArray = [];
 let legalMoves = {};
 
-const States = { SELECT: "SELECT", MOVE: "MOVE", GAMEOVER: "GAMEOVER" };
+const States = {
+  SELECT: "SELECT",
+  MOVE: "MOVE",
+  GAMEOVER: "GAMEOVER",
+  SETUP: "SETUP",
+};
 let state = States.SELECT;
 let whiteMove = true;
 let selectedPiece = null;
@@ -229,6 +234,7 @@ function checkLegalMoves() {
       }
     }
   }
+  console.log(legalMoves);
   return legalMoves;
 }
 
@@ -237,9 +243,10 @@ function checkIfLegalMove(posStart, posEnd) {
   let color = getPieceColor(boardArray[posStart]);
   boardArrCopy[posEnd] = boardArrCopy[posStart];
   boardArrCopy[posStart] = "0";
-  let rookPos;
+
   let wKingPos = boardArrCopy.indexOf("K");
   let bKingPos = boardArrCopy.indexOf("k");
+  let rookIndexes = [];
   let knightIndexes = [];
   let i = -1;
   switch (color) {
@@ -248,12 +255,21 @@ function checkIfLegalMove(posStart, posEnd) {
       wKingPos = boardArrCopy.indexOf("K");
 
       // Check if black rook attacks king
-      if (rookPos > wKingPos) {
-        if (ifRookAttacksKing(boardArrCopy, wKingPos, rookPos)) {
-          return false;
+      i = -1;
+      rookIndexes = [];
+      while ((i = boardArrCopy.indexOf("r", i + 1)) !== -1) {
+        rookIndexes.push(i);
+      }
+      for (index in rookIndexes) {
+        if (rookIndexes[index] > wKingPos) {
+          if (ifRookAttacksKing(boardArrCopy, wKingPos, rookIndexes[index])) {
+            return false;
+          }
         }
       }
+
       // Check if black knight attacks king
+      i = -1;
       knightIndexes = [];
 
       while ((i = boardArrCopy.indexOf("n", i + 1)) !== -1) {
@@ -272,14 +288,21 @@ function checkIfLegalMove(posStart, posEnd) {
       }
       break;
     case "black":
-      rookPos = boardArrCopy.indexOf("R");
       // Check if white rook attacks king
-      if (bKingPos > rookPos) {
-        if (ifRookAttacksKing(boardArrCopy, rookPos, bKingPos)) {
-          return false;
+      i = -1;
+      rookIndexes = [];
+      while ((i = boardArrCopy.indexOf("R", i + 1)) !== -1) {
+        rookIndexes.push(i);
+      }
+      for (index in rookIndexes) {
+        if (bKingPos > rookIndexes[index]) {
+          if (ifRookAttacksKing(boardArrCopy, rookIndexes[index], bKingPos)) {
+            return false;
+          }
         }
       }
       // Check if white knight attacks king
+      i = -1;
       knightIndexes = [];
 
       while ((i = boardArrCopy.indexOf("N", i + 1)) !== -1) {
@@ -318,18 +341,26 @@ function ifRookAttacksKing(boardArr, startPos, endPos) {
 function ifIsCheck() {
   let wKingPos = boardArray.indexOf("K");
   let bKingPos = boardArray.indexOf("k");
-  let wRookPos = boardArray.indexOf("R");
-  let bRookPos = boardArray.indexOf("r");
+  let wRookIndexes = [];
+  let bRookIndexes = [];
   let wKnightIndexes = [];
   let bKnightIndexes = [];
   let i = -1;
   if (whiteMove) {
-    if (bRookPos > wKingPos) {
-      if (ifRookAttacksKing(boardArray, wKingPos, bRookPos)) {
-        return true;
+    i = -1;
+    bRookIndexes = [];
+    while ((i = boardArray.indexOf("r", i + 1)) !== -1) {
+      bRookIndexes.push(i);
+    }
+    for (index in bRookIndexes) {
+      if (bRookIndexes[index] > wKingPos) {
+        if (ifRookAttacksKing(boardArray, wKingPos, bRookIndexes[index])) {
+          return true;
+        }
       }
     }
 
+    i = -1;
     bKnightIndexes = [];
     while ((i = boardArray.indexOf("n", i + 1)) !== -1) {
       bKnightIndexes.push(i);
@@ -346,12 +377,20 @@ function ifIsCheck() {
       }
     }
   } else {
-    if (bKingPos > wRookPos) {
-      if (ifRookAttacksKing(boardArray, wRookPos, bKingPos)) {
-        return true;
+    i = -1;
+    wRookIndexes = [];
+    while ((i = boardArray.indexOf("R", i + 1)) !== -1) {
+      wRookIndexes.push(i);
+    }
+    for (index in wRookIndexes) {
+      if (bKingPos > wRookIndexes[index]) {
+        if (ifRookAttacksKing(boardArray, wRookIndexes[index], bKingPos)) {
+          return true;
+        }
       }
     }
 
+    i = -1;
     wKnightIndexes = [];
     while ((i = boardArray.indexOf("N", i + 1)) !== -1) {
       wKnightIndexes.push(i);
@@ -431,6 +470,11 @@ function setUpCanvas(canvas) {
   });
 }
 
+function startGame() {
+  addCanvas();
+  setUpGame();
+}
+
 function setUpGame() {
   state = States.SELECT;
   whiteMove = true;
@@ -442,6 +486,10 @@ function setUpGame() {
   gameResult.hidden = true;
   resetGameButton.hidden = true;
 }
+
+function addCanvas() {
+  boardDiv.appendChild(canvas);
+}
 window.addEventListener("load", function () {
   boardDiv = document.getElementById("board");
   canvas = document.createElement("canvas");
@@ -449,6 +497,5 @@ window.addEventListener("load", function () {
   gameResult = document.getElementById("gameResult");
   resetGameButton = document.getElementById("resetGameButton");
   setUpCanvas(canvas, ctx);
-  boardDiv.appendChild(canvas);
-  setUpGame();
+  startGame();
 });
