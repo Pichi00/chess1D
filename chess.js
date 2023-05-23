@@ -1,7 +1,7 @@
 let boardDiv, canvas, ctx;
 const boardSize = 8;
 const squareSize = 100;
-const defaultBoardArray = ["K", "N", "R", "0", "0", "r", "n", "k"];
+const defaultBoardArray = ["K", "N", "N", "0", "0", "0", "0", "k"];
 const whitePieces = ["K", "N", "R"];
 const blackPieces = ["k", "n", "r"];
 let gameResult;
@@ -98,7 +98,8 @@ function selectPiece(e) {
 function movePiece(e) {
   let newSquare = getSquareFromClick(e);
   let allLegalMoves = checkLegalMoves();
-  let legalMoves = allLegalMoves[boardArray[selectedSquare]];
+  let legalMoves = allLegalMoves[boardArray[selectedSquare] + selectedSquare];
+  console.log(allLegalMoves[boardArray[selectedSquare] + selectedSquare]);
   if (legalMoves != undefined && legalMoves.includes(newSquare)) {
     boardArray[newSquare] = boardArray[selectedSquare];
     boardArray[selectedSquare] = "0";
@@ -227,10 +228,10 @@ function checkLegalMoves() {
     let avaliableMoves = checkAvaliableMoves(i);
     for (move in avaliableMoves) {
       if (checkIfLegalMove(i, avaliableMoves[move])) {
-        if (legalMoves[boardArray[i]] === undefined) {
-          legalMoves[boardArray[i]] = [];
+        if (legalMoves[boardArray[i] + i] === undefined) {
+          legalMoves[boardArray[i] + i] = [];
         }
-        legalMoves[boardArray[i]].push(avaliableMoves[move]);
+        legalMoves[boardArray[i] + i].push(avaliableMoves[move]);
       }
     }
   }
