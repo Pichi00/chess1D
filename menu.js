@@ -1,12 +1,18 @@
 let size = 8;
 
 let configMenu;
+let configContainer;
 let gameView;
+let customConfigCheckbox;
+
+let custom = false;
 
 function goToGame() {
   configMenu.hidden = true;
   gameView.hidden = false;
-  saveConfig();
+  if (custom) {
+    saveConfig();
+  }
   startGame();
 }
 
@@ -31,34 +37,39 @@ function generateSelectTable() {
   //Append king
   let column = document.createElement("td");
   column.innerHTML = "Król";
+  column.style.color = "white";
   row.appendChild(column);
 
-  appendChildSelectPiece(column, row, 1, 3);
-  appendChildSelect(column, row, 3, Math.floor(size / 2));
+  appendChildSelectPiece(row, 1, 3, "white");
+  appendChildSelect(row, 3, Math.floor(size / 2), "white");
   if (size % 2 == 0) {
-    appendChildSelect(column, row, Math.floor(size / 2), size - 3);
+    appendChildSelect(row, Math.floor(size / 2), size - 3, "black");
   } else {
     column = document.createElement("td");
     column.innerHTML = "Brak";
     row.appendChild(column);
-    appendChildSelect(column, row, Math.floor(size / 2) + 1, size - 3);
+    appendChildSelect(row, Math.floor(size / 2) + 1, size - 3, "black");
   }
-  appendChildSelectPiece(column, row, size - 3, size - 1);
+  appendChildSelectPiece(row, size - 3, size - 1, "black");
 
   //Append other king
   column = document.createElement("td");
   column.innerHTML = "Król";
+  column.style.color = "black";
   row.appendChild(column);
 
   table.appendChild(row);
 }
 
-function appendChildSelectPiece(column, row, start, end) {
+function appendChildSelectPiece(row, start, end, color) {
   let select;
   let option;
+  let column;
   for (let i = start; i < end; i++) {
     column = document.createElement("td");
+
     select = document.createElement("select");
+    select.style.color = color;
     select.id = "pieceSelect" + i;
     select.name = "pieceSelect" + i;
     //Append options
@@ -77,12 +88,14 @@ function appendChildSelectPiece(column, row, start, end) {
   }
 }
 
-function appendChildSelect(column, row, start, end) {
+function appendChildSelect(row, start, end, color) {
   let select;
   let option;
   for (let i = start; i < end; i++) {
     column = document.createElement("td");
+
     select = document.createElement("select");
+    select.style.color = color;
     select.id = "pieceSelect" + i;
     select.name = "pieceSelect" + i;
     //Append options
@@ -118,21 +131,39 @@ function saveConfig() {
 
   for (let i = 1; i < size / 2; i++) {
     let piece = row.childNodes[i].childNodes[0].value;
-    position.push(piece[0].toUpperCase());
+    if (piece != undefined) {
+      position.push(piece[0].toUpperCase());
+    } else {
+      position.push("0");
+    }
   }
 
   for (let i = Math.ceil(size / 2); i < size - 1; i++) {
     let piece = row.childNodes[i].childNodes[0].value;
-    position.push(piece[0].toLowerCase());
+    if (piece != undefined) {
+      position.push(piece[0].toLowerCase());
+    } else {
+      position.push("0");
+    }
   }
 
   position.push("k");
   defaultBoardArray = position;
 }
 
+function toggleConfig() {
+  custom = customConfigCheckbox.checked;
+  configContainer.hidden = !custom;
+  if (!custom) {
+    defaultBoardArray = ["K", "N", "R", "0", "0", "r", "n", "k"];
+    boardSize = 8;
+  }
+}
+
 window.addEventListener("load", function () {
   configMenu = document.getElementById("configMenu");
   gameView = document.getElementById("gameView");
+  configContainer = document.getElementById("configContainer");
+  customConfigCheckbox = document.getElementById("customConfigCheckbox");
   generateSelectTable();
-  saveConfig();
 });

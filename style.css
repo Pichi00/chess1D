@@ -12,7 +12,7 @@ p {
   color: white;
 }
 main {
-  height: 80vh;
+  min-height: 82vh;
 }
 #board {
   display: flex;
@@ -38,8 +38,9 @@ button:active {
 footer {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   color: white;
+  margin: 5px;
 }
 .square {
   width: 100px;
@@ -63,7 +64,7 @@ footer {
 }
 table {
   border-collapse: collapse;
-  font-size: 20px;
+  font-size: 18px;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -75,7 +76,7 @@ td {
 }
 
 select {
-  font-size: 20px;
+  font-size: 18px;
   font-family: "Courier New", Courier, monospace;
   background-color: #948d87;
   border: 0;
@@ -83,4 +84,21 @@ select {
 
 option {
   text-align: center;
+}
+
+#configMenuContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+#rules {
+  padding: 20px;
+  color: white;
+  text-align: left;
+  width: 90%;
+  background-color: #4e4844;
+  border-radius: 20px;
+  min-height: 100px;
 }

@@ -14,37 +14,89 @@
     <h1>Szachy 1D</h1>
     <main>
       <div id="configMenu">
-        <h2>Rozmiar szachownicy</h2>
-        <select
-          id="boardSizeSelect"
-          name="boardSizeSelect"
-          style="border: 2px black solid"
-          onchange="generateSelectTable()"
-        >
-          <option value="8">8</option>
-          <option value="9">9</option>
-          <option value="10">10</option>
-          <option value="11">11</option>
-          <option value="12">12</option>
-        </select>
-        <h2>Pozycja startowa</h2>
-        <div id="tableContainer">
-          <table id="selectPositionTable">
-            <tr>
-              <td>Król</td>
-              <td>
-                <select id="pieceSelect1" name="pieceSelect1">
-                  <option value="knight">Skoczek</option>
-                  <option value="rook">Wieża</option>
-                  <option value="none">Brak</option>
-                </select>
-              </td>
-            </tr>
-          </table>
-        </div>
+        <div id="configMenuContainer">
+          <h2>
+            Własne ustawienie pozycji
+            <input
+              type="checkbox"
+              id="customConfigCheckbox"
+              onchange="toggleConfig()"
+            />
+          </h2>
 
-        <div id="buttons">
-          <button id="startGame" onclick="goToGame()">Rozpocznij grę</button>
+          <div id="configContainer" hidden>
+            <h2>Rozmiar szachownicy</h2>
+            <select
+              id="boardSizeSelect"
+              name="boardSizeSelect"
+              style="border: 2px black solid"
+              onchange="generateSelectTable()"
+            >
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+            </select>
+            <h2>Pozycja startowa</h2>
+            <div id="tableContainer">
+              <table id="selectPositionTable">
+                <tr>
+                  <td>Król</td>
+                  <td>
+                    <select id="pieceSelect1" name="pieceSelect1">
+                      <option value="knight">Skoczek</option>
+                      <option value="rook">Wieża</option>
+                      <option value="none">Brak</option>
+                    </select>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <div id="buttons">
+            <button id="startGameCustom" onclick="goToGame()">
+              Rozpocznij grę
+            </button>
+          </div>
+          <div id="rules">
+            <h2>Zasady</h2>
+            <p>
+              Szachy jednowymiarowe to wariant w którym rozgrywka toczy się na
+              jednej linii. W standardowym ustawieniu, plansza ma 8 pól a
+              zawodnicy mają do dyspozycji króla, skoczka oraz wieżę.
+            </p>
+            <h3>Figury</h3>
+            <ul>
+              <li>
+                <strong>Król</strong> - porusza się o jedno pole w lewo lub
+                prawo.
+              </li>
+              <li>
+                <strong>Wieża</strong> - porusza się o dowolną liczbę pól w lewo
+                lub prawo.
+              </li>
+              <li>
+                <strong>Skoczek</strong> - porusza się o 2 pola w lewo lub
+                prawo. Może przeskakiwać nad figurami.
+              </li>
+            </ul>
+            <h3>Koniec gry</h3>
+            <ul>
+              <li>
+                <strong>Zwycięstwo</strong> - skończenie partii przez mata.
+              </li>
+              <li>
+                <strong>Remis</strong> - może nastąpić przez:
+                <ul>
+                  <li>pata,</li>
+                  <li>trzykrotne powtórzenie pozycji,</li>
+                  <li>niewystarczający materiał matujący.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -73,7 +125,8 @@
     </main>
 
     <footer>
-      <div>Projekt zaliczeniowy na przedmiot "Teoria szachów"</div>
+      <div>Rok akademicki 2022/2023</div>
+      <div>Projekt zaliczeniowy z przedmiotu "Teoria szachów"</div>
       <div>Autor: Piotr Kołodziejski</div>
     </footer>
   </body>
